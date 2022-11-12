@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deno app</title>
+</head>
+<body>
+    <style>
+        body{
+            min-height: 100vh;
+            width: 100%;
+            background-color: black;
+            display: grid;
+            place-content: center;
+        }
+        .button{
+            border: none;
+            border-radius: 0;
+            padding: 0.3rem 0.7rem;
+            background: linear-gradient(45deg, red, orange, yellow, green, blue, indigo, violet, red);
+            font-weight: 800;
+            font-size: 1rem;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        .button:hover{
+            background: aliceblue;
+        }
+        .input{
+            border-radius: 0;
+            padding: 0.3rem 0.7rem;
+            font-size: 1rem;
+        }
+    </style>
+
+    <main>
+        <form id="form">
+            <input class="input" type="text">
+            <button class="button">SUBMIT COLOR</button>
+        </form>
+        <section id="container">
+
+        </section>
+    </main>
+
+    <script>
+        const container = document.getElementById('container');
+        const form = document.getElementById('form');
+
+        const fetchColors = async () =>{
+            try {
+                const response = await fetch('/colors');
+                const colorArray = await response.json();
+                container.innerHTML = '';
+                for(const c of colorArray){
+                    const newColor = document.createElement("h2");
+                    newColor.textContent = c;
+                    newColor.style.color = c;
+                    newColor.style.textAlign = "center";
+                    container.appendChild(newColor);
+                }
+            } catch (error) {
+                console.error(error);
+            }
+        }
+
+        form.addEventListener('submit', e => {
+            e.preventDefault();
+            fetch(`/${form[0].value}`, {
+                headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+                },
+                method: 'POST',
+                body: JSON.stringify('done')
+            })
+                .then(response => fetchColors())
+                .catch(err => console.error(err))
+            form.reset()
+        })
+
+        fetchColors();
+    </script>
+</body>
+</html>
